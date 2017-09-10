@@ -6,6 +6,10 @@
   "scripts": {
     "start": "node app.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://git.heroku.com/cerbis-youtube-downloader.git"
+  },
   "author": "Jonathan Bell",
   "license": "WTFPL",
   "dependencies": {
