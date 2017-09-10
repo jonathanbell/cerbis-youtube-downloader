@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{head.title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+  </head>
+  <body>
+
+    <h1>{{body.heading}} <img id="heart-graphic" src="/img/heart.png" /></h1>
+
+    <form id="getAudio" action="/getvideo" method="post">
+      <label for="videoURL">Video URL:</label>
+      <input id="videoURL" type="text" name="videoURL" placeholder="YouTube video URL" required>
+      <input type="submit" value="Get mp3">
+    </form>
+
+    <div id="buck-brand">
+      <img src="/img/buck.png" />
+      <p>Made by Buck!</p>
+    </div>
+
+    <div id="working">
+      <img src="/img/fawn.jpg" />
+      <p class="msg"></p>
+    </div>
+
+    <div id="results">
+      <!--<a href="#" class="download button">here are some fake resluts</a>
+      <a href="#" class="download button">here are some fake resluts</a>-->
+    </div>
+
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="/js/front.js"></script>
+
+  </body>
+</html>

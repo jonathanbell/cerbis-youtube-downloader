@@ -1,0 +1,124 @@
+/**
+* Even more basic than normalize.css...
+*/
+
+html {
+  /* Set system font as the font d'jour. */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  /* Use the better box model. */
+  box-sizing: border-box;
+  /* Display text at the right size, bud. */
+  /* https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust */
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Again, with the box-model.. Jeesh! */
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  /* Make text look good. Note, this can be processor intensive. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* No margin on body. If we were really strict, we'd set this on everything. */
+  margin: 0;
+  padding: 1rem;
+}
+
+/* Don't let these elements break out of thier shell, ever. */
+audio, video, img, iframe {
+  max-width: 100%;
+}
+
+/* Don't display empty p tags. *Certain* CMS's accidentally make these, sometimes. */
+p:empty {
+  display: none;
+}
+
+#heart-graphic {
+  position: relative;
+  bottom: -13px;
+  left: -5px;
+  height: auto;
+  width: 50px;
+  transform: rotate(20deg);
+  -webkit-transition: all 0.333s ease-out;
+  -moz-transition: all 0.333s ease-out;
+  -o-transition: all 0.333s ease-out;
+  transition: all 0.333s ease-out;
+}
+
+h1 {
+  cursor: default;
+  margin-top: 5px;
+}
+
+h1:hover #heart-graphic {
+  transform: rotate(30deg);
+}
+
+#videoURL {
+  width: 550px;
+  max-width: 90%;
+}
+
+#buck-brand {
+  width: 115px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+#working {
+  width: 270px;
+  text-align: center;
+  color: blueviolet;
+  opacity: 0;
+  float: left;
+  margin-top: 1rem;
+}
+
+  @keyframes fadePulse {
+    from { opacity: 0; }
+  }
+
+  #working img.pulse {
+      animation: fadePulse 1.25s infinite alternate;
+  }
+
+#results {
+  min-width: 300px;
+  min-height: 200px;
+  margin-top: 1rem;
+  margin-left: 1rem;
+  float: left;
+  padding-top: 1rem;
+}
+
+.download {
+  margin-bottom: 2rem;
+}
+
+
+.download.button {
+  text-decoration: none;
+  color: pink;
+  text-align: center;
+  background: blueviolet;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 2px solid lightgoldenrodyellow;
+  -webkit-transition: background-color 0.5s ease-out;
+  -moz-transition: background-color 0.5s ease-out;
+  -o-transition: background-color 0.5s ease-out;
+  transition: background-color 0.5s ease-out;
+}
+.download.button:hover {
+  color: white;
+  background: #2d94a1;
+}
