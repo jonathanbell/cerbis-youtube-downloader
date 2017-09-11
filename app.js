@@ -19,51 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // Support encoded bodies.
 
 let PORT = process.env.PORT || 3013;
 
-function getVideo(url) {
-
-  // First, check if an old file exists that needs to be deleted.
-  fs.unlink('./music/tmpvideo.mp4', function(err) {
-    if (err && err.code == 'ENOENT') {
-      // File doens't exist.
-      console.log('An old temporary video file didn\'t exist, so no need to remove it.');
-    } else if (err) {
-      throw err;
-    } else {
-      console.log('Old temporary video file removed.');
-    }
-  });
-
-  return new Promise(function(resolve, reject) {
-
-    let video = youtubedl(url, ['--format=18'], { cwd: __dirname });
-    let fileName = '';
-
-    // Will be called when the download starts.
-    video.on('info', function(info) {
-      console.log('Download started.');
-      console.log('Filename: ' + info._filename);
-      console.log('Size: ' + info.size);
-
-      fileName = info._filename.slice(0, -4);
-    });
-
-    // Error handler.
-    video.on('error', function error(err) {
-      console.log('Error downloading video: ', err);
-      reject(err);
-    });
-
-    // Make the request.
-    video.pipe(fs.createWriteStream('./music/tmpvideo.mp4'));
-
-    video.on('end', function() {
-      console.log('Temporary video file (tmpvideo.mp4) sucessfully downloaded. Starting conversion to audio...');
-      resolve(fileName);
-    });
-
-  });
-
-}
+var availableFile = false;
 
 app.get('/', function(req, res) {
 
@@ -84,19 +40,58 @@ app.get('/', function(req, res) {
 
 app.post('/getvideo', function(req, res) {
 
+  availableFile = false;
+
+  // First, check if an old file exists that needs to be deleted.
+  fs.unlink('./music/tmpvideo.mp4', function(err) {
+    if (err && err.code == 'ENOENT') {
+      // File doens't exist.
+      console.log('An old temporary video file didn\'t exist, so no need to remove it.');
+    } else if (err) {
+      throw err;
+    } else {
+      console.log('Old temporary video file removed.');
+    }
+  });
+
   if (req.body.videoURL == undefined) {
     res.status(404).send('No YouTube video URL sent.').end();
     return;
   }
 
   if (req.body.videoURL != undefined || req.body.videoURL != '') {
+
     var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
     var match = req.body.videoURL.match(regExp);
     if (match && match[2].length == 11) {
 
-      getVideo(req.body.videoURL).then(function(fileName) {
+      let video = youtubedl(req.body.videoURL, ['--format=18'], { cwd: __dirname });
+      let fileName = '';
 
-        // Got the mp4 file via our first promise. Now, convert it to mp3.
+      // Will be called when the download starts.
+      video.on('info', function(info) {
+        console.log('Download started.');
+        console.log('File name: ' + info._filename);
+        console.log('File size: ' + info.size);
+
+        fileName = info._filename.slice(0, -4);
+        // Return the filename for download later.
+        res.send(fileName);
+      });
+
+      // Error handler.
+      video.on('error', function error(err) {
+        console.log('Error downloading video: ', err);
+      });
+
+      // Make the request for the video to YouTube.
+      video.pipe(fs.createWriteStream('./music/tmpvideo.mp4'));
+
+      video.on('end', function() {
+
+        console.log('Temporary video file (tmpvideo.mp4) sucessfully downloaded. Starting conversion to audio...');
+
+        // Got the mp4 file. Now, convert it to mp3.
         exec(ffmpeg.path + ' -i ' + __dirname + '/music/tmpvideo.mp4 -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "' + __dirname + '/music/' + fileName + '.mp3"', (error, stdout, stderr) => {
 
           if (error) {
@@ -115,16 +110,11 @@ app.post('/getvideo', function(req, res) {
             }
           });
 
+          availableFile = true;
           console.log('All downloading and conversion tasks complete. File is available for download.');
 
-          // Return the HTML link for download.
-          res.send('<div class="download">Got it, Fawn! Download: <a class="download button" href="/music/' + fileName + '.mp3">' + fileName + '.mp3</a></div>');
+        }); // exec()
 
-        });
-
-      }, function(error) {
-        // Our promise was rejected :(
-        res.status(500).send('Failed to get the YouTube video from the Interweb :( ', error);
       });
 
     } else {
@@ -134,11 +124,17 @@ app.post('/getvideo', function(req, res) {
     res.status(404).send('No YouTube video URL sent.').end();
   }
 
-}); // app.post()
+}); // app.post('/getvideo')
 
 // Make mp3's download!
 app.get('/music/:filename', function (req, res) {
-  res.download(__dirname + '/music/' + req.params.filename);
+
+  if (availableFile) {
+    res.download(__dirname + '/music/' + req.params.filename);
+  } else {
+    res.sendStatus(204);
+  }
+
 });
 
 app.listen(PORT, function() {
