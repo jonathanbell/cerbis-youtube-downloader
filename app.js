@@ -10,8 +10,8 @@ const bodyParser = require('body-parser');
 const ipfilter = require('express-ipfilter').IpFilter;
 const IpDeniedError = require('express-ipfilter').IpDeniedError;
 
-// Allowed IPs. See `express-ipfilter` above.
-var ips = ['::1', '127.0.0.1', ['169.254.1.1','169.254.1.9'], '24.69.180.239', ['142.34.74.1', '142.34.74.254']];
+// Dis-allowed IPs. See `express-ipfilter` above.
+var ips = ['142.34.74.1', ['160.254.1.1', '160.254.1.9']];
 
 const mustacheExpress = require('mustache-express');
 app.engine('mustache', mustacheExpress());
@@ -21,17 +21,17 @@ app.set('views', __dirname + '/views');
 app.use(express.static('static'));
 app.use(bodyParser.json()); // Support json encoded bodies.
 app.use(bodyParser.urlencoded({ extended: true })); // Support encoded bodies.
-app.use(ipfilter(ips, {mode: 'allow'})); // Restrict IPs.
 
+// Restrict IPs.
+app.use(ipfilter(ips)); // Restrict IPs.
 app.use(function(err, req, res, _next) {
 
   // console.log('IP Filter threw an error: ', err);
-
   if (err instanceof IpDeniedError) {
     res.status(401);
   }
 
-  res.send('Access is denyed to this IP. Please email jonathanbell.ca@gmail.com for access.');
+  res.send('Access is denyed to this app is denied from your location. Please email jonathanbell.ca@gmail.com for access.');
 
 });
 
