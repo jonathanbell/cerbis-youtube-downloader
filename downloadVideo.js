@@ -8,19 +8,17 @@ const youtubedl = require('youtube-dl');
 const ffmpeg = require('ffmpeg-static'); // ffmpeg.path
 
 function getVideo(url) {
-
   // First, check if an old file exists that needs to be deleted.
   fs.unlink('tmpvideo.mp4', function(err) {
     if (err && err.code == 'ENOENT') {
       // File doens't exist.
-      console.log('tmpvideo.mp4 didn\'t exist, so no need to remove it.');
+      console.log("tmpvideo.mp4 didn't exist, so no need to remove it.");
     } else if (err) {
       throw err;
     }
   });
 
   return new Promise(function(resolve, reject) {
-
     let video = youtubedl(url, ['--format=18'], { cwd: __dirname });
     let fileName = '';
 
@@ -46,40 +44,44 @@ function getVideo(url) {
       console.log('tmpvideo.mp4 sucessfully downloaded.');
       resolve(fileName);
     });
-
   });
-
 }
 
 module.exports = function(url) {
+  getVideo(url).then(
+    function(fileName) {
+      // Got the mp4. Now, convert it to mp3.
+      exec(
+        ffmpeg.path +
+          ' -i tmpvideo.mp4 -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "' +
+          fileName +
+          '.mp3"',
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error(`ffmpeg error: ${error}`);
+            return error;
+          }
 
-  getVideo(url).then(function(fileName) {
+          // console.log(`stdout: ${stdout}`);
+          // console.log(`stderr: ${stderr}`); // This is the printed output from ffmpeg.
 
-    // Got the mp4. Now, convert it to mp3.
-    exec(ffmpeg.path + ' -i tmpvideo.mp4 -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 "' + fileName + '.mp3"', (error, stdout, stderr) => {
-      if (error) {
-        console.error(`ffmpeg error: ${error}`);
-        return error;
-      }
+          // We have made an mp3 from our mp4 so we can delete the video file.
+          fs.unlink('tmpvideo.mp4', function(err) {
+            if (err) throw err;
+          });
 
-      // console.log(`stdout: ${stdout}`);
-      // console.log(`stderr: ${stderr}`); // This is the printed output from ffmpeg.
-
-      // We have made an mp3 from our mp4 so we can delete the video file.
-      fs.unlink('tmpvideo.mp4', function(err) {
-        if (err) throw err;
-      });
-
-      console.log('All downloading and conversion tasks complete.');
-      return fileName;
-    });
-
-  }, function(error) {
-
-    // Our promise was rejected :(
-    console.error('Failed to get the YouTube video from the Interweb :( ', error);
-    return false;
-
-  });
-
+          console.log('All downloading and conversion tasks complete.');
+          return fileName;
+        }
+      );
+    },
+    function(error) {
+      // Our promise was rejected :(
+      console.error(
+        'Failed to get the YouTube video from the Interweb :( ',
+        error
+      );
+      return false;
+    }
+  );
 };

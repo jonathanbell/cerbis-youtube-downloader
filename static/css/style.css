@@ -4,8 +4,8 @@
 
 html {
   /* Set system font as the font d'jour. */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
   /* Use the better box model. */
   box-sizing: border-box;
   /* Display text at the right size, bud. */
@@ -16,7 +16,9 @@ html {
 }
 
 /* Again, with the box-model.. Jeesh! */
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 
@@ -31,7 +33,10 @@ body {
 }
 
 /* Don't let these elements break out of thier shell, ever. */
-audio, video, img, iframe {
+audio,
+video,
+img,
+iframe {
   max-width: 100%;
 }
 
@@ -83,13 +88,15 @@ h1:hover #heart-graphic {
   margin-top: 1rem;
 }
 
-  @keyframes fadePulse {
-    from { opacity: 0; }
+@keyframes fadePulse {
+  from {
+    opacity: 0;
   }
+}
 
-  #working img.pulse {
-      animation: fadePulse 1.25s infinite alternate;
-  }
+#working img.pulse {
+  animation: fadePulse 1.25s infinite alternate;
+}
 
 #results {
   min-width: 300px;
@@ -103,7 +110,6 @@ h1:hover #heart-graphic {
 .download {
   margin-bottom: 2rem;
 }
-
 
 .download.button {
   text-decoration: none;
